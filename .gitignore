@@ -1,5 +1,9 @@
 # Provider WireGuard credentials
+# Ignore private provider credentials
 providers/**/*.conf
+
+# Allow safe example templates
+!providers/**/examples/*.conf
 
 # Runtime data
 logs/
