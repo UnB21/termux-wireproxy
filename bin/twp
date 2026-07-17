@@ -49,6 +49,10 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/ip.sh"
         ;;
 
+    logs)
+        "$PROJECT_DIR/scripts/logs.sh" "$@"
+        ;;
+
     use)
         shift
         "$PROJECT_DIR/scripts/use.sh" "$@"
@@ -70,6 +74,8 @@ Usage:
   twp providers
   twp doctor
   twp ip
+  twp logs
+  twp logs-f
   twp use <provider> <profile>
   twp version
 
