@@ -30,7 +30,7 @@ The project is designed to make starting, stopping, checking, and troubleshootin
 Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/UnB21/termux-wireproxy.git
 cd termux-wireproxy
 ```
 
@@ -187,4 +187,5 @@ This project is currently under active development.
 
 ## License
 
-License information will be added before the first public release.
+This project is licensed under the MIT License.  
+See the [LICENSE](LICENSE) file for details.
