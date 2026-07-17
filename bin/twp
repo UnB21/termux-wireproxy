@@ -28,6 +28,10 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/health.sh"
         ;;
 
+    current)
+        "$PROJECT_DIR/scripts/current.sh"
+        ;;
+
     version)
         echo "Termux WireProxy"
         echo "Version: $(cat "$PROJECT_DIR/VERSION")"
@@ -54,6 +58,7 @@ Usage:
   twp restart
   twp status
   twp health
+  twp current
   twp providers
   twp use <provider> <profile>
   twp version
