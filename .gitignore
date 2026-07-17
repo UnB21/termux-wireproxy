@@ -1,0 +1,10 @@
+# Provider WireGuard credentials
+providers/*/*.conf
+
+# Runtime data
+logs/
+state/
+
+# Termux/editor files
+*.swp
+*.bak
