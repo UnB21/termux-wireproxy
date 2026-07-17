@@ -41,6 +41,10 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/providers.sh"
         ;;
 
+    doctor)
+        "$PROJECT_DIR/scripts/doctor.sh"
+        ;;
+
     use)
         shift
         "$PROJECT_DIR/scripts/use.sh" "$@"
@@ -60,6 +64,7 @@ Usage:
   twp health
   twp current
   twp providers
+  twp doctor
   twp use <provider> <profile>
   twp version
 
