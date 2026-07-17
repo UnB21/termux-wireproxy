@@ -28,6 +28,11 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/health.sh"
         ;;
 
+    version)
+        echo "Termux WireProxy"
+        echo "Version: $(cat "$PROJECT_DIR/VERSION")"
+        ;;
+
     providers)
         "$PROJECT_DIR/scripts/providers.sh"
         ;;
