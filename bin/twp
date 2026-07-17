@@ -75,7 +75,7 @@ Usage:
   twp doctor
   twp ip
   twp logs
-  twp logs-f
+  twp logs -f
   twp use <provider> <profile>
   twp version
 
