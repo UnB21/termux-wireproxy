@@ -81,6 +81,7 @@ cat <<EOF
 
 =====================================
       Termux WireProxy
+        Version $VERSION
 =====================================
 
 Provider : $PROVIDER
