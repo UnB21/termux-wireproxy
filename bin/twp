@@ -1,0 +1,56 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+set -euo pipefail
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+COMMAND="${1:-help}"
+
+case "$COMMAND" in
+
+    start)
+        "$PROJECT_DIR/scripts/start.sh"
+        ;;
+
+    stop)
+        "$PROJECT_DIR/scripts/stop.sh"
+        ;;
+
+    restart)
+        "$PROJECT_DIR/scripts/restart.sh"
+        ;;
+
+    status)
+        "$PROJECT_DIR/scripts/status.sh"
+        ;;
+
+    health)
+        "$PROJECT_DIR/scripts/health.sh"
+        ;;
+
+    providers)
+        "$PROJECT_DIR/scripts/providers.sh"
+        ;;
+
+    use)
+        shift
+        "$PROJECT_DIR/scripts/use.sh" "$@"
+        ;;
+
+    *)
+        cat <<EOF
+
+Termux WireProxy
+
+Usage:
+
+  twp start
+  twp stop
+  twp restart
+  twp status
+  twp health
+
+EOF
+        ;;
+
+esac
