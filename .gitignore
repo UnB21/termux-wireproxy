@@ -1,5 +1,5 @@
 # Provider WireGuard credentials
-providers/*/*.conf
+providers/**/*.conf
 
 # Runtime data
 logs/
