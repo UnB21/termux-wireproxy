@@ -54,6 +54,15 @@ Usage:
   twp restart
   twp status
   twp health
+  twp providers
+  twp use <provider> <profile>
+  twp version
+
+Examples:
+
+  twp use proton us.conf
+  twp status
+  twp health
 
 EOF
         ;;
