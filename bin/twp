@@ -59,6 +59,17 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/use.sh" "$@"
         ;;
 
+    install)
+        echo "Installing twp command..."
+
+        TARGET="$PREFIX/bin/twp"
+
+        ln -sf "$SCRIPT_PATH" "$TARGET"
+
+        echo "Installed:"
+        echo "$TARGET"
+        ;;
+
     *)
         cat <<EOF
 
@@ -78,6 +89,7 @@ Usage:
   twp logs
   twp logs -f
   twp use <provider> <profile>
+  twp install
   twp version
 
 Examples:
