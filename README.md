@@ -56,10 +56,30 @@ Clone the project:
 git clone https://github.com/UnB21/termux-wireproxy.git
 ```
 
-Enter the project directory:
+Enter the project directory you just cloned:
 
 ```bash
 cd termux-wireproxy
+```
+
+If you cloned the repository using a different directory name, enter that directory instead.
+
+Example:
+
+```bash
+cd termux-wireproxy-test
+```
+
+You can verify your current working directory at any time by running:
+
+```bash
+pwd
+```
+
+Example output:
+
+```text
+/data/data/com.termux/files/home/termux-wireproxy
 ```
 
 ---
@@ -100,6 +120,40 @@ twp doctor
 
 ---
 
+## Understanding the Project Layout
+
+After installation, all project files are stored inside the directory you cloned.
+
+To see the project files, run:
+
+```bash
+ls
+```
+
+You should see folders similar to:
+
+```text
+bin
+configs
+lib
+logs
+providers
+scripts
+state
+```
+
+The most important directories are:
+
+| Directory | Purpose |
+|-----------|---------|
+| `providers/` | Stores your private WireGuard configuration files |
+| `configs/` | Project configuration files |
+| `scripts/` | Internal scripts used by the `twp` command |
+| `logs/` | WireProxy log files |
+| `state/` | Runtime state information |
+
+All commands shown throughout this guide should be run from inside the project directory unless stated otherwise.
+
 ## First-Time Configuration
 
 Termux WireProxy uses provider profiles.
@@ -126,9 +180,9 @@ providers/
 
 ## Adding a WireGuard Profile
 
-Your VPN provider should provide a WireGuard configuration file.
+A WireGuard profile is a configuration file supplied by your VPN provider or generated for your own WireGuard server.
 
-The file normally contains:
+The file usually has a `.conf` extension and contains information such as:
 
 - Interface private key
 - VPN address
@@ -142,21 +196,31 @@ Example filename:
 us.conf
 ```
 
-Create a provider directory:
+Create a directory for your VPN provider:
 
 ```bash
 mkdir -p providers/proton
 ```
 
-Place your configuration file:
+Verify that the directory was created:
 
-```text
-providers/proton/us.conf
+```bash
+ls providers
 ```
 
-Do not upload this file to GitHub or share it publicly.
+Expected output:
 
-Your WireGuard profile contains private keys and should be treated like a password.
+```text
+proton
+```
+
+At this point, the provider directory exists but is empty.
+
+Your WireGuard configuration file must be copied into that directory before it can be used.
+
+Never upload your WireGuard configuration file to GitHub or share it publicly.
+
+Your WireGuard profile contains private cryptographic keys and should be treated like a password.
 
 ---
 
@@ -218,6 +282,52 @@ Prefer tools that generate private keys locally and do not transmit private keys
 
 ---
 
+## Copying Your WireGuard Configuration into Termux
+
+If you downloaded your WireGuard configuration using your Android web browser, it is usually saved in your Downloads folder.
+
+To allow Termux to access Android storage, run:
+
+```bash
+termux-setup-storage
+```
+
+When prompted, grant the requested storage permission.
+
+Your Downloads folder will then be available at:
+
+```text
+~/storage/downloads
+```
+
+List the downloaded files:
+
+```bash
+ls ~/storage/downloads
+```
+
+If your configuration file is named `us.conf`, copy it into your provider directory:
+
+```bash
+cp ~/storage/downloads/us.conf providers/proton/
+```
+
+Verify that it was copied successfully:
+
+```bash
+ls providers/proton
+```
+
+Expected output:
+
+```text
+us.conf
+```
+
+Your WireGuard configuration is now ready to be selected by Termux WireProxy.
+
+---
+
 ## Available Providers
 
 List available provider profiles:
@@ -230,44 +340,54 @@ twp providers
 
 ## Selecting a Provider Profile
 
-After adding your profile, select it:
+The `twp use` command expects two arguments:
 
-```bash
+```text
 twp use <provider> <profile>
 ```
 
-Example:
+- `<provider>` is the name of the directory inside `providers/`
+- `<profile>` is the name of the WireGuard configuration file
+
+For example, if your project looks like this:
+
+```text
+providers/
+└── proton/
+    └── us.conf
+```
+
+Run:
 
 ```bash
 twp use proton us.conf
 ```
 
-This updates the active WireProxy configuration.
+Another example:
 
-Check the current selection:
+```text
+providers/
+└── myserver/
+    └── home.conf
+```
+
+Run:
+
+```bash
+twp use myserver home.conf
+```
+
+After selecting a profile, verify the active configuration:
 
 ```bash
 twp current
-```
-
-Example output:
-
-```text
-Provider:
-proton
-
-Profile:
-us.conf
-
-SOCKS5:
-127.0.0.1:25344
 ```
 
 ---
 
 ## Quick Start Example
 
-After installation, a complete first connection setup may look like this.
+The following example demonstrates a complete first-time setup after installation.
 
 Create a provider directory:
 
@@ -275,7 +395,7 @@ Create a provider directory:
 mkdir -p providers/myvpn
 ```
 
-Place your WireGuard configuration file:
+Copy your WireGuard configuration file into that directory:
 
 ```text
 providers/myvpn/home.conf
@@ -305,7 +425,7 @@ Start WireProxy:
 twp start
 ```
 
-Check the connection:
+Check that WireProxy is running:
 
 ```bash
 twp status
@@ -316,6 +436,8 @@ Verify your VPN exit IP:
 ```bash
 twp ip
 ```
+
+If everything is configured correctly, your public IP address should now be the IP address of your VPN server or VPN provider.
 
 ---
 
@@ -434,7 +556,7 @@ twp version
 
 ## Troubleshooting
 
-## `twp: command not found`
+### `twp: command not found`
 
 Run the installer again:
 
@@ -450,7 +572,7 @@ twp version
 
 ---
 
-## WireProxy is missing
+### WireProxy is missing
 
 Run:
 
@@ -468,29 +590,43 @@ wireproxy --version
 
 ---
 
-## Provider profile missing
+### Provider profile missing
 
-Check your provider folder:
+This usually means Termux WireProxy could not find the WireGuard configuration file it expects.
 
-```bash
-ls -R providers
-```
-
-Confirm your profile exists:
-
-```text
-providers/provider-name/profile.conf
-```
-
-Then activate it:
+First, list your provider directories:
 
 ```bash
-twp use provider-name profile.conf
+ls providers
+```
+
+Then list the profiles inside your provider directory:
+
+```bash
+ls providers/proton
+```
+
+Verify the currently selected configuration:
+
+```bash
+twp current
+```
+
+If you selected the wrong provider or profile, activate the correct one:
+
+```bash
+twp use <provider> <profile>
+```
+
+Example:
+
+```bash
+twp use proton us.conf
 ```
 
 ---
 
-## WireProxy will not start
+### WireProxy will not start
 
 Run:
 
@@ -512,7 +648,7 @@ twp restart
 
 ---
 
-## SOCKS5 proxy unavailable
+### SOCKS5 proxy unavailable
 
 If `twp doctor` reports that SOCKS5 is unavailable:
 
