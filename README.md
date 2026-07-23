@@ -79,7 +79,7 @@ pwd
 Example output:
 
 ```text
-/data/data/com.termux/files/home/termux-wireproxy
+/data/data/com.termux/files/home/<your-project-directory>
 ```
 
 ---

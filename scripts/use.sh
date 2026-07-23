@@ -2,7 +2,9 @@
 
 set -euo pipefail
 
-source "$HOME/termux-wireproxy/configs/project.conf"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+source "$PROJECT_DIR/configs/project.conf"
 
 if [ $# -ne 2 ]; then
     echo "Usage:"
