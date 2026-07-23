@@ -12,3 +12,4 @@ state/
 # Termux/editor files
 *.swp
 *.bak
+README.md.backup
