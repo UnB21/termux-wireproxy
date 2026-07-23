@@ -17,6 +17,15 @@ if is_running; then
     exit 0
 fi
 
+echo "Preparing WireProxy configuration..."
+
+cat > "$WIREPROXY_CONFIG" <<EOF
+WGConfig = $WG_CONFIG
+
+[Socks5]
+BindAddress = $SOCKS_HOST:$SOCKS_PORT
+EOF
+
 echo "Starting wireproxy..."
 
 "$WIREPROXY_BIN" -s -c "$WIREPROXY_CONFIG" \
