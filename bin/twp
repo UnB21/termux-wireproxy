@@ -59,6 +59,10 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/use.sh" "$@"
         ;;
 
+    init)
+        "$PROJECT_DIR/scripts/init.sh"
+        ;;
+
     install)
         echo "Installing twp command..."
 
