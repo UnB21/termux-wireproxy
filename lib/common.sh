@@ -67,7 +67,7 @@ check_files() {
         || die "WireGuard configuration not found."
 
     [ -f "$WIREPROXY_CONFIG" ] \
-        || die "wireproxy.conf not found."
+        || die "wireproxy configuration not found."
 
 }
 
