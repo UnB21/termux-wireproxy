@@ -10,6 +10,7 @@ set -euo pipefail
 # Load project configuration
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$PROJECT_DIR/configs/project.conf"
+source "$PROJECT_DIR/lib/state.sh"
 
 ########################################
 # Version
