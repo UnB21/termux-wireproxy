@@ -217,26 +217,45 @@ Example:
 
 ---
 
-# Step 8 - Generate Configuration
+# Step 8 - Generate Runtime Configuration
 
 Create:
+state/wireproxy.conf
 
-```
-configs/wireproxy.conf
-```
+The generated configuration file should be treated as runtime state.
 
-Using:
+The user should not manually edit this file.
 
-```
-WGConfig = <active profile>
-```
+`twp` should generate this file automatically from:
+configs/project.conf
 
-and:
+and the active WireGuard profile.
 
-```
-[Socks5]
-BindAddress = 127.0.0.1:25344
-```
+Example generated configuration:
+WGConfig = /data/data/com.termux/files/home/termux-wireproxy/providers/proton/us.conf
+[Socks5] BindAddress = 127.0.0.1:25344
+
+The generated configuration should:
+
+- use the currently selected provider
+- use the currently selected profile
+- contain absolute paths
+- be recreated when profiles change
+- avoid requiring manual user edits
+
+The purpose of this design is to separate:
+configs/
+
+from:
+state/
+
+Configuration templates and user settings remain inside:
+configs/
+
+Generated runtime files are stored inside:
+state/
+
+This prevents accidental user modification of generated files and makes troubleshooting easier.
 
 ---
 
