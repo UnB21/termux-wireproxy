@@ -19,12 +19,7 @@ fi
 
 echo "Preparing WireProxy configuration..."
 
-cat > "$WIREPROXY_CONFIG" <<EOF
-WGConfig = $WG_CONFIG
-
-[Socks5]
-BindAddress = $SOCKS_HOST:$SOCKS_PORT
-EOF
+generate_wireproxy_config
 
 echo "Starting wireproxy..."
 

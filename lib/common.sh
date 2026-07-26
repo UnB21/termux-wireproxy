@@ -13,7 +13,7 @@ source "$PROJECT_DIR/configs/project.conf"
 
 ########################################
 # Version
-#######################################
+########################################
 
 VERSION_FILE="$PROJECT_DIR/VERSION"
 
@@ -68,6 +68,23 @@ check_files() {
 
     [ -f "$WIREPROXY_CONFIG" ] \
         || die "wireproxy configuration not found."
+
+}
+
+########################################
+# Runtime configuration generation
+########################################
+
+generate_wireproxy_config() {
+
+    mkdir -p "$STATE_DIR"
+
+    cat > "$WIREPROXY_CONFIG" <<EOF
+WGConfig = $WG_CONFIG
+
+[Socks5]
+BindAddress = $SOCKS_HOST:$SOCKS_PORT
+EOF
 
 }
 
