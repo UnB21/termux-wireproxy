@@ -4,12 +4,7 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-source "$PROJECT_DIR/configs/project.conf"
-source "$PROJECT_DIR/lib/common.sh"
-source "$PROJECT_DIR/lib/state.sh"
-
-# Load active runtime profile if available
-load_active_profile >/dev/null 2>&1 || true
+source "$PROJECT_DIR/lib/runtime.sh"
 
 echo "================================="
 echo " Available Providers"
