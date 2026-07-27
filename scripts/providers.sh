@@ -5,6 +5,7 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$PROJECT_DIR/lib/runtime.sh"
+source "$PROJECT_DIR/lib/providers.sh"
 
 echo "================================="
 echo " Available Providers"
@@ -12,13 +13,9 @@ echo "================================="
 
 FOUND_PROVIDER=false
 
-for provider_dir in "$PROJECT_DIR/providers/"*; do
-
-    [ -d "$provider_dir" ] || continue
+for provider in $(list_providers); do
 
     FOUND_PROVIDER=true
-
-    provider=$(basename "$provider_dir")
 
     echo
     echo "Provider: $provider"
@@ -26,28 +23,24 @@ for provider_dir in "$PROJECT_DIR/providers/"*; do
 
     FOUND_PROFILE=false
 
-    for profile in "$provider_dir"/*.conf; do
-
-        [ -f "$profile" ] || continue
+    for profile in $(list_profiles "$provider"); do
 
         FOUND_PROFILE=true
 
-        profile_name=$(basename "$profile")
-
-        if [ "$provider" = "$PROVIDER" ] && [ "$profile_name" = "$PROFILE" ]; then
-            echo "  ★ $profile_name"
+        if [ "$provider" = "$PROVIDER" ] && [ "$profile" = "$PROFILE" ]; then
+            echo "  ★ $profile"
         else
-            echo "    $profile_name"
+            echo "    $profile"
         fi
 
     done
 
-    if [ -d "$provider_dir/examples" ]; then
-        echo "    examples/"
-    fi
-
     if [ "$FOUND_PROFILE" = false ]; then
         echo "    (no profiles)"
+    fi
+
+    if [ -d "$(provider_path "$provider")/examples" ]; then
+        echo "    examples/"
     fi
 
 done
@@ -62,5 +55,6 @@ echo "================================="
 echo " Active Profile"
 echo "================================="
 echo
+
 echo "Provider : $PROVIDER"
 echo "Profile  : $PROFILE"
