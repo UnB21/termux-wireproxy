@@ -42,6 +42,17 @@ EOF
 }
 
 ########################################
+# Refresh Derived Paths
+########################################
+
+refresh_profile_paths() {
+
+    ACTIVE_PROVIDER_DIR="$PROJECT_DIR/providers/$PROVIDER"
+    WG_CONFIG="$ACTIVE_PROVIDER_DIR/$PROFILE"
+
+}
+
+########################################
 # Load Active Profile
 ########################################
 
@@ -50,6 +61,8 @@ load_active_profile() {
     if [ -f "$ACTIVE_STATE_FILE" ]; then
 
         source "$ACTIVE_STATE_FILE"
+
+        refresh_profile_paths
 
         return 0
 
@@ -65,6 +78,6 @@ load_active_profile() {
 
 has_active_profile() {
 
-    [ -f "$ACTIVE_STATE_FILE" ]
+    [ -f "$ACTIVE_STATE_FILE"
 
 }

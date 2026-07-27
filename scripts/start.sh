@@ -17,6 +17,14 @@ if is_running; then
     exit 0
 fi
 
+echo "Loading active profile..."
+
+if load_active_profile; then
+    echo "Using: $PROVIDER/$PROFILE"
+else
+    echo "Using default profile: $PROVIDER/$PROFILE"
+fi
+
 echo "Preparing WireProxy configuration..."
 
 generate_wireproxy_config
