@@ -4,8 +4,8 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-source "$PROJECT_DIR/configs/project.conf"
-source "$PROJECT_DIR/lib/state.sh"
+source "$PROJECT_DIR/lib/runtime.sh"
+source "$PROJECT_DIR/lib/providers.sh"
 
 if [ $# -ne 2 ]; then
     echo "Usage:"
@@ -16,11 +16,9 @@ fi
 NEW_PROVIDER="$1"
 NEW_PROFILE="$2"
 
-PROFILE_PATH="$PROJECT_DIR/providers/$NEW_PROVIDER/$NEW_PROFILE"
-
-if [ ! -f "$PROFILE_PATH" ]; then
+if ! profile_exists "$NEW_PROVIDER" "$NEW_PROFILE"; then
     echo "ERROR: Profile not found:"
-    echo "$PROFILE_PATH"
+    echo "$(get_profile_path "$NEW_PROVIDER" "$NEW_PROFILE")"
     exit 1
 fi
 
