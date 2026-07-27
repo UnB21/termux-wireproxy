@@ -6,6 +6,13 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$PROJECT_DIR/configs/project.conf"
 source "$PROJECT_DIR/lib/common.sh"
+source "$PROJECT_DIR/lib/state.sh"
+
+if load_active_profile; then
+    ACTIVE_PROFILE_LOADED=true
+else
+    ACTIVE_PROFILE_LOADED=false
+fi
 
 echo "================================="
 echo " Termux WireProxy Status"
@@ -17,7 +24,21 @@ echo "${VERSION:-unknown}"
 
 echo
 echo "=== Provider ==="
-echo "$PROVIDER / $PROFILE"
+
+if [ "$ACTIVE_PROFILE_LOADED" = true ]; then
+    echo "$PROVIDER / $PROFILE"
+else
+    echo "$PROVIDER / $PROFILE (default)"
+fi
+
+echo
+echo "=== WireGuard Profile ==="
+
+if [ "$ACTIVE_PROFILE_LOADED" = true ]; then
+    echo "$WG_CONFIG"
+else
+    echo "No active runtime profile."
+fi
 
 echo
 echo "=== Wireproxy Process ==="
@@ -33,6 +54,10 @@ fi
 echo
 echo "=== SOCKS5 Proxy ==="
 echo "$SOCKS_HOST:$SOCKS_PORT"
+
+echo
+echo "=== Runtime Config ==="
+echo "$WIREPROXY_CONFIG"
 
 echo
 echo "=== VPN Exit IP ==="
