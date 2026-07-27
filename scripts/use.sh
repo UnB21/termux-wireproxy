@@ -5,6 +5,7 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$PROJECT_DIR/configs/project.conf"
+source "$PROJECT_DIR/lib/state.sh"
 
 if [ $# -ne 2 ]; then
     echo "Usage:"
@@ -14,14 +15,7 @@ fi
 
 NEW_PROVIDER="$1"
 NEW_PROFILE="$2"
-if [ "$PROVIDER" = "$NEW_PROVIDER" ] && [ "$PROFILE" = "$NEW_PROFILE" ]; then
-    echo "Already active:"
-    echo "Provider: $PROVIDER"
-    echo "Profile:  $PROFILE"
-    echo
-    echo "No restart required."
-    exit 0
-fi
+
 PROFILE_PATH="$PROJECT_DIR/providers/$NEW_PROVIDER/$NEW_PROFILE"
 
 if [ ! -f "$PROFILE_PATH" ]; then
@@ -30,16 +24,29 @@ if [ ! -f "$PROFILE_PATH" ]; then
     exit 1
 fi
 
-CONFIG_FILE="$PROJECT_DIR/configs/project.conf"
+if has_active_profile; then
 
-sed -i "s/^PROVIDER=.*/PROVIDER=\"$NEW_PROVIDER\"/" "$CONFIG_FILE"
-sed -i "s/^PROFILE=.*/PROFILE=\"$NEW_PROFILE\"/" "$CONFIG_FILE"
+    load_active_profile
+
+    if [ "$PROVIDER" = "$NEW_PROVIDER" ] && [ "$PROFILE" = "$NEW_PROFILE" ]; then
+        echo "Already active:"
+        echo "Provider: $PROVIDER"
+        echo "Profile:  $PROFILE"
+        exit 0
+    fi
+
+fi
+
+save_active_profile "$NEW_PROVIDER" "$NEW_PROFILE"
 
 echo "Active provider changed:"
 echo "Provider: $NEW_PROVIDER"
 echo "Profile:  $NEW_PROFILE"
 
 echo
-echo "Restarting WireProxy..."
+echo "State updated:"
+echo "$STATE_DIR/active.conf"
 
-"$PROJECT_DIR/scripts/restart.sh"
+echo
+echo "Restart required to apply changes:"
+echo "  twp restart"

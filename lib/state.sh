@@ -78,6 +78,6 @@ load_active_profile() {
 
 has_active_profile() {
 
-    [ -f "$ACTIVE_STATE_FILE"
+    [ -f "$ACTIVE_STATE_FILE" ]
 
 }
