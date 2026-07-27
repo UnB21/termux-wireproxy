@@ -4,14 +4,14 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-source "$PROJECT_DIR/configs/project.conf"
+source "$PROJECT_DIR/lib/runtime.sh"
 
 echo "================================="
 echo " Termux WireProxy Exit IP"
 echo "================================="
 echo
 
-if ! pgrep -f "wireproxy.*$WIREPROXY_CONFIG" >/dev/null; then
+if ! is_running; then
     echo "ERROR: Wireproxy is not running."
     exit 1
 fi
