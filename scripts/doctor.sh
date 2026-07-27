@@ -4,11 +4,9 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-source "$PROJECT_DIR/configs/project.conf"
-source "$PROJECT_DIR/lib/common.sh"
-source "$PROJECT_DIR/lib/state.sh"
+source "$PROJECT_DIR/lib/runtime.sh"
 
-if load_active_profile; then
+if has_active_profile; then
     ACTIVE_PROFILE_LOADED=true
 else
     ACTIVE_PROFILE_LOADED=false
