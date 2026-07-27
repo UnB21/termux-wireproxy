@@ -5,6 +5,14 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$PROJECT_DIR/configs/project.conf"
+source "$PROJECT_DIR/lib/common.sh"
+source "$PROJECT_DIR/lib/state.sh"
+
+if load_active_profile; then
+    ACTIVE_PROFILE_LOADED=true
+else
+    ACTIVE_PROFILE_LOADED=false
+fi
 
 echo "================================="
 echo " Termux WireProxy Doctor"
@@ -22,6 +30,15 @@ check_fail() {
     FAIL=1
 }
 
+echo "=== Runtime Profile ==="
+
+if [ "$ACTIVE_PROFILE_LOADED" = true ]; then
+    check_ok "active profile: $PROVIDER/$PROFILE"
+else
+    check_fail "no active runtime profile"
+fi
+
+echo
 echo "=== Binary Check ==="
 
 if command -v "$WIREPROXY_BIN" >/dev/null 2>&1; then
@@ -34,9 +51,9 @@ echo
 echo "=== Configuration Check ==="
 
 if [ -f "$WIREPROXY_CONFIG" ]; then
-    check_ok "wireproxy config found"
+    check_ok "runtime config found"
 else
-    check_fail "wireproxy config missing"
+    check_fail "runtime config missing"
 fi
 
 if [ -f "$WG_CONFIG" ]; then
@@ -48,7 +65,7 @@ fi
 echo
 echo "=== Process Check ==="
 
-if pgrep -f "wireproxy.*$WIREPROXY_CONFIG" >/dev/null; then
+if is_running; then
     check_ok "wireproxy running"
 else
     check_fail "wireproxy not running"
@@ -57,14 +74,32 @@ fi
 echo
 echo "=== SOCKS Check ==="
 
-if curl --silent \
+if curl \
+    --silent \
+    --max-time 5 \
     --socks5-hostname "$SOCKS_HOST:$SOCKS_PORT" \
     https://api.ipify.org >/dev/null; then
 
-    check_ok "SOCKS5 proxy responding"
+    check_ok "SOCKS5 upstream connection working"
+
+    EXIT_IP=$(curl \
+        --silent \
+        --max-time 5 \
+        --socks5-hostname "$SOCKS_HOST:$SOCKS_PORT" \
+        https://api.ipify.org)
+
+    echo "Exit IP: $EXIT_IP"
 
 else
-    check_fail "SOCKS5 proxy unavailable"
+
+    check_fail "SOCKS5 upstream connection failed"
+
+    echo
+    echo "Possible causes:"
+    echo "- Another Android VPN service may be active (RethinkDNS, VPN apps, etc.)"
+    echo "- WireGuard tunnel failed"
+    echo "- Provider profile may be invalid"
+
 fi
 
 echo
