@@ -4,75 +4,120 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-source "$PROJECT_DIR/configs/project.conf"
+source "$PROJECT_DIR/lib/common.sh"
+source "$PROJECT_DIR/lib/diagnostics.sh"
+
+FAILURES=0
 
 echo "================================="
 echo " Termux WireProxy Doctor"
 echo "================================="
-echo
 
-FAIL=0
-
-check_ok() {
-    echo "[✓] $1"
-}
-
-check_fail() {
-    echo "[✗] $1"
-    FAIL=1
-}
-
-echo "=== Binary Check ==="
+diag_section "Binary Check"
 
 if command -v "$WIREPROXY_BIN" >/dev/null 2>&1; then
-    check_ok "wireproxy installed"
+    diag_ok "wireproxy installed"
 else
-    check_fail "wireproxy missing"
+    diag_fail "wireproxy not installed"
+    FAILURES=$((FAILURES + 1))
 fi
 
+
+diag_section "Active Configuration"
+
+echo "Provider : $PROVIDER"
+echo "Profile  : $PROFILE"
 echo
-echo "=== Configuration Check ==="
-
-if [ -f "$WIREPROXY_CONFIG" ]; then
-    check_ok "wireproxy config found"
-else
-    check_fail "wireproxy config missing"
-fi
 
 if [ -f "$WG_CONFIG" ]; then
-    check_ok "provider profile found"
+    diag_ok "provider profile found"
 else
-    check_fail "provider profile missing"
+    diag_fail "provider profile missing"
+    FAILURES=$((FAILURES + 1))
 fi
 
-echo
-echo "=== Process Check ==="
-
-if pgrep -f "wireproxy.*$WIREPROXY_CONFIG" >/dev/null; then
-    check_ok "wireproxy running"
+if [ -f "$WIREPROXY_CONFIG" ]; then
+    diag_ok "wireproxy config found"
 else
-    check_fail "wireproxy not running"
+    diag_fail "wireproxy config missing"
+    FAILURES=$((FAILURES + 1))
 fi
 
-echo
-echo "=== SOCKS Check ==="
 
-if curl --silent \
-    --socks5-hostname "$SOCKS_HOST:$SOCKS_PORT" \
-    https://api.ipify.org >/dev/null; then
+diag_section "WireGuard Profile"
 
-    check_ok "SOCKS5 proxy responding"
+if [ -f "$WG_CONFIG" ]; then
 
-else
-    check_fail "SOCKS5 proxy unavailable"
+    if grep -q "^PrivateKey" "$WG_CONFIG"; then
+        diag_ok "PrivateKey present"
+    else
+        diag_fail "PrivateKey missing"
+        FAILURES=$((FAILURES + 1))
+    fi
+
+    if grep -q "^PublicKey" "$WG_CONFIG"; then
+        diag_ok "Peer PublicKey present"
+    else
+        diag_fail "Peer PublicKey missing"
+        FAILURES=$((FAILURES + 1))
+    fi
+
+    ENDPOINT=$(grep "^Endpoint" "$WG_CONFIG" | sed 's/^Endpoint = //' || true)
+
+    if [ -n "$ENDPOINT" ]; then
+        diag_ok "Endpoint: $ENDPOINT"
+    else
+        diag_fail "Endpoint missing"
+        FAILURES=$((FAILURES + 1))
+    fi
+
+    ALLOWED=$(grep "^AllowedIPs" "$WG_CONFIG" || true)
+
+    if echo "$ALLOWED" | grep -q "0.0.0.0/0"; then
+        diag_ok "IPv4 routing enabled"
+    else
+        diag_warn "IPv4 routing disabled"
+    fi
+
+    if echo "$ALLOWED" | grep -q "::/0"; then
+        diag_ok "IPv6 routing enabled"
+    else
+        diag_warn "IPv6 routing disabled"
+    fi
+
 fi
 
+
+diag_section "Process Check"
+
+if is_running; then
+    diag_ok "wireproxy running"
+    echo "PID: $(get_pid | head -n1)"
+else
+    diag_fail "wireproxy not running"
+    FAILURES=$((FAILURES + 1))
+fi
+
+
+diag_section "SOCKS Check"
+
+if command -v curl >/dev/null 2>&1 &&
+   curl --silent --socks5-hostname "$SOCKS_HOST:$SOCKS_PORT" http://example.com >/dev/null 2>&1; then
+
+    diag_ok "SOCKS5 proxy responding"
+
+else
+    diag_fail "SOCKS5 proxy unavailable"
+    FAILURES=$((FAILURES + 1))
+fi
+
+
 echo
 
-if [ "$FAIL" -eq 0 ]; then
+if [ "$FAILURES" -eq 0 ]; then
     echo "STATUS: READY"
 else
-    echo "STATUS: ISSUES FOUND"
+    echo "STATUS: NOT READY"
+    echo
+    echo "Issues detected: $FAILURES"
 fi
-
-exit "$FAIL"
