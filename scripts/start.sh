@@ -4,7 +4,6 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-source "$PROJECT_DIR/configs/project.conf"
 source "$PROJECT_DIR/lib/common.sh"
 
 mkdir -p "$LOG_DIR" "$STATE_DIR"
