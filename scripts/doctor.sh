@@ -48,41 +48,8 @@ diag_section "WireGuard Profile"
 
 if [ -f "$WG_CONFIG" ]; then
 
-    if grep -q "^PrivateKey" "$WG_CONFIG"; then
-        diag_ok "PrivateKey present"
-    else
-        diag_fail "PrivateKey missing"
+    if ! validate_wireguard_profile "$WG_CONFIG"; then
         FAILURES=$((FAILURES + 1))
-    fi
-
-    if grep -q "^PublicKey" "$WG_CONFIG"; then
-        diag_ok "Peer PublicKey present"
-    else
-        diag_fail "Peer PublicKey missing"
-        FAILURES=$((FAILURES + 1))
-    fi
-
-    ENDPOINT=$(grep "^Endpoint" "$WG_CONFIG" | sed 's/^Endpoint = //' || true)
-
-    if [ -n "$ENDPOINT" ]; then
-        diag_ok "Endpoint: $ENDPOINT"
-    else
-        diag_fail "Endpoint missing"
-        FAILURES=$((FAILURES + 1))
-    fi
-
-    ALLOWED=$(grep "^AllowedIPs" "$WG_CONFIG" || true)
-
-    if echo "$ALLOWED" | grep -q "0.0.0.0/0"; then
-        diag_ok "IPv4 routing enabled"
-    else
-        diag_warn "IPv4 routing disabled"
-    fi
-
-    if echo "$ALLOWED" | grep -q "::/0"; then
-        diag_ok "IPv6 routing enabled"
-    else
-        diag_warn "IPv6 routing disabled"
     fi
 
 fi
