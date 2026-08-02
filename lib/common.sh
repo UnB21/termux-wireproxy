@@ -7,13 +7,35 @@
 
 set -euo pipefail
 
-# Load project configuration
+########################################
+# Configuration Loading
+########################################
+
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Load tracked default configuration
 source "$PROJECT_DIR/configs/project.conf"
+
+# Load local user overrides if available
+if [ -f "$PROJECT_DIR/configs/project.local.conf" ]; then
+    source "$PROJECT_DIR/configs/project.local.conf"
+fi
+
+########################################
+# Rebuild Derived Paths
+########################################
+
+ACTIVE_PROVIDER_DIR="$PROJECT_DIR/providers/$PROVIDER"
+
+WG_CONFIG="$ACTIVE_PROVIDER_DIR/$PROFILE"
+
+WIREPROXY_CONFIG="$PROJECT_DIR/configs/wireproxy.conf"
+
+PID_FILE="$STATE_DIR/wireproxy.pid"
 
 ########################################
 # Version
-#######################################
+########################################
 
 VERSION_FILE="$PROJECT_DIR/VERSION"
 

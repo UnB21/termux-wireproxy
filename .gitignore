@@ -5,6 +5,9 @@ providers/**/*.conf
 # Allow safe example templates
 !providers/**/examples/*.conf
 
+# Local user configuration
+configs/project.local.conf
+
 # Runtime data
 logs/
 state/

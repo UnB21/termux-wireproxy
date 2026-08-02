@@ -33,9 +33,8 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/current.sh"
         ;;
 
-    version)
-        echo "Termux WireProxy"
-        echo "Version: $(cat "$PROJECT_DIR/VERSION")"
+    profiles|list)
+        "$PROJECT_DIR/scripts/profiles.sh"
         ;;
 
     providers)
@@ -56,7 +55,22 @@ case "$COMMAND" in
 
     use)
         shift
+
+        if [ "$#" -ne 2 ]; then
+            echo "Usage:"
+            echo "  twp use <provider> <profile>"
+            echo
+            echo "Example:"
+            echo "  twp use proton jcwgconfig3-US-FREE-46-ipv4test.conf"
+            exit 1
+        fi
+
         "$PROJECT_DIR/scripts/use.sh" "$@"
+        ;;
+
+    version)
+        echo "Termux WireProxy"
+        echo "Version: $(cat "$PROJECT_DIR/VERSION")"
         ;;
 
     install)
@@ -70,7 +84,7 @@ case "$COMMAND" in
         echo "$TARGET"
         ;;
 
-    *)
+    help|*)
         cat <<EOF
 
 Termux WireProxy
@@ -83,20 +97,29 @@ Usage:
   twp status
   twp health
   twp current
+  twp profiles
   twp providers
   twp doctor
   twp ip
   twp logs
   twp logs -f
   twp use <provider> <profile>
-  twp install
   twp version
+  twp install
+
+Aliases:
+
+  twp list        (same as twp profiles)
 
 Examples:
 
-  twp use proton us.conf
-  twp status
-  twp health
+  twp profiles
+
+  twp use proton jcwgconfig3-US-FREE-46-ipv4test.conf
+
+  twp restart
+
+  twp doctor
 
 EOF
         ;;

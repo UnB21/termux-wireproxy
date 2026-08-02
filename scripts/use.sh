@@ -6,6 +6,10 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$PROJECT_DIR/configs/project.conf"
 
+if [ -f "$PROJECT_DIR/configs/project.local.conf" ]; then
+    source "$PROJECT_DIR/configs/project.local.conf"
+fi
+
 if [ $# -ne 2 ]; then
     echo "Usage:"
     echo "  twp use <provider> <profile>"
@@ -14,6 +18,7 @@ fi
 
 NEW_PROVIDER="$1"
 NEW_PROFILE="$2"
+
 if [ "$PROVIDER" = "$NEW_PROVIDER" ] && [ "$PROFILE" = "$NEW_PROFILE" ]; then
     echo "Already active:"
     echo "Provider: $PROVIDER"
@@ -22,6 +27,7 @@ if [ "$PROVIDER" = "$NEW_PROVIDER" ] && [ "$PROFILE" = "$NEW_PROFILE" ]; then
     echo "No restart required."
     exit 0
 fi
+
 PROFILE_PATH="$PROJECT_DIR/providers/$NEW_PROVIDER/$NEW_PROFILE"
 
 if [ ! -f "$PROFILE_PATH" ]; then
@@ -30,10 +36,21 @@ if [ ! -f "$PROFILE_PATH" ]; then
     exit 1
 fi
 
-CONFIG_FILE="$PROJECT_DIR/configs/project.conf"
+LOCAL_CONFIG="$PROJECT_DIR/configs/project.local.conf"
 
-sed -i "s/^PROVIDER=.*/PROVIDER=\"$NEW_PROVIDER\"/" "$CONFIG_FILE"
-sed -i "s/^PROFILE=.*/PROFILE=\"$NEW_PROFILE\"/" "$CONFIG_FILE"
+if [ ! -f "$LOCAL_CONFIG" ]; then
+    cat > "$LOCAL_CONFIG" <<EOF
+#########################################
+# Termux WireProxy Local Configuration
+#########################################
+
+PROVIDER="$NEW_PROVIDER"
+PROFILE="$NEW_PROFILE"
+EOF
+else
+    sed -i "s/^PROVIDER=.*/PROVIDER=\"$NEW_PROVIDER\"/" "$LOCAL_CONFIG"
+    sed -i "s/^PROFILE=.*/PROFILE=\"$NEW_PROFILE\"/" "$LOCAL_CONFIG"
+fi
 
 echo "Active provider changed:"
 echo "Provider: $NEW_PROVIDER"
