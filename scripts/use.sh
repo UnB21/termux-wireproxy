@@ -4,11 +4,7 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-source "$PROJECT_DIR/configs/project.conf"
-
-if [ -f "$PROJECT_DIR/configs/project.local.conf" ]; then
-    source "$PROJECT_DIR/configs/project.local.conf"
-fi
+source "$PROJECT_DIR/lib/common.sh"
 
 if [ $# -ne 2 ]; then
     echo "Usage:"
