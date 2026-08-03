@@ -180,6 +180,26 @@ profile_has_ipv6() {
     echo "$allowed" | grep -q "::/0"
 }
 
+
+profile_exists() {
+
+    local provider="$1"
+    local profile="$2"
+
+    [ -f "$PROJECT_DIR/providers/$provider/$profile" ]
+}
+
+
+list_profiles() {
+
+    local provider="$1"
+
+    local profile_dir="$PROJECT_DIR/providers/$provider"
+
+    find "$profile_dir" -maxdepth 1 -name "*.conf" -type f \
+        -printf "%f\n" | sort
+}
+
 ########################################
 # Information
 ########################################
