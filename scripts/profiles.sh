@@ -4,7 +4,7 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-source "$PROJECT_DIR/configs/project.conf"
+source "$PROJECT_DIR/lib/common.sh"
 
 echo "================================="
 echo " Available WireGuard Profiles"
@@ -24,16 +24,14 @@ fi
 
 COUNT=0
 
-shopt -s nullglob
-
-for PROFILE_FILE in "$PROFILE_DIR"/*.conf; do
+while IFS= read -r PROFILE_FILE; do
 
     COUNT=$((COUNT + 1))
 
     PROFILE_NAME="$(basename "$PROFILE_FILE")"
 
     if [ "$PROFILE_NAME" = "$PROFILE" ]; then
-        MARKER="[*]"
+        MARKER="[✓]"
     else
         MARKER="[ ]"
     fi
@@ -42,7 +40,8 @@ for PROFILE_FILE in "$PROFILE_DIR"/*.conf; do
 
     ALLOWED_IPS=$(grep -m1 "^AllowedIPs" "$PROFILE_FILE" | cut -d'=' -f2- | xargs || true)
 
-    if echo "$ALLOWED_IPS" | grep -q "0.0.0.0/0" && echo "$ALLOWED_IPS" | grep -q "::/0"; then
+    if echo "$ALLOWED_IPS" | grep -q "0.0.0.0/0" &&
+       echo "$ALLOWED_IPS" | grep -q "::/0"; then
         ROUTING="Dual Stack"
     elif echo "$ALLOWED_IPS" | grep -q "0.0.0.0/0"; then
         ROUTING="IPv4"
@@ -62,9 +61,7 @@ for PROFILE_FILE in "$PROFILE_DIR"/*.conf; do
     echo "    Key      : $KEY"
     echo
 
-done
-
-shopt -u nullglob
+done < <(find "$PROFILE_DIR" -maxdepth 1 -name "*.conf" | sort)
 
 if [ "$COUNT" -eq 0 ]; then
     echo "[!] No WireGuard profiles found."
