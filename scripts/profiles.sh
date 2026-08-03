@@ -14,7 +14,7 @@ echo
 echo "Provider : $PROVIDER"
 echo
 
-PROFILE_DIR="$PROJECT_DIR/providers/$PROVIDER"
+PROFILE_DIR="$ACTIVE_PROVIDER_DIR"
 
 if [ ! -d "$PROFILE_DIR" ]; then
     echo "[✗] Provider directory missing:"
@@ -36,20 +36,11 @@ while IFS= read -r PROFILE_FILE; do
         MARKER="[ ]"
     fi
 
-    ENDPOINT=$(grep -m1 "^Endpoint" "$PROFILE_FILE" | cut -d'=' -f2- | xargs || true)
+    ENDPOINT="$(get_profile_endpoint "$PROFILE_FILE")"
 
-    ALLOWED_IPS=$(grep -m1 "^AllowedIPs" "$PROFILE_FILE" | cut -d'=' -f2- | xargs || true)
+    ROUTING="$(get_profile_routing "$PROFILE_FILE")"
 
-    if echo "$ALLOWED_IPS" | grep -q "0.0.0.0/0" &&
-       echo "$ALLOWED_IPS" | grep -q "::/0"; then
-        ROUTING="Dual Stack"
-    elif echo "$ALLOWED_IPS" | grep -q "0.0.0.0/0"; then
-        ROUTING="IPv4"
-    else
-        ROUTING="Partial"
-    fi
-
-    if grep -q "^PrivateKey" "$PROFILE_FILE"; then
+    if profile_has_private_key "$PROFILE_FILE"; then
         KEY="Present"
     else
         KEY="Missing"

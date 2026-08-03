@@ -94,6 +94,70 @@ check_files() {
 }
 
 ########################################
+# WireGuard Profile Helpers
+########################################
+
+get_profile_endpoint() {
+
+    local profile="$1"
+
+    grep -m1 "^Endpoint" "$profile" \
+        | cut -d'=' -f2- \
+        | xargs || true
+}
+
+get_profile_allowed_ips() {
+
+    local profile="$1"
+
+    grep -m1 "^AllowedIPs" "$profile" \
+        | cut -d'=' -f2- \
+        | xargs || true
+}
+
+profile_has_private_key() {
+
+    local profile="$1"
+
+    grep -q "^PrivateKey" "$profile"
+}
+
+profile_has_peer_key() {
+
+    local profile="$1"
+
+    grep -q "^PublicKey" "$profile"
+}
+
+get_profile_routing() {
+
+    local profile="$1"
+
+    local allowed
+
+    allowed="$(get_profile_allowed_ips "$profile")"
+
+    if echo "$allowed" | grep -q "0.0.0.0/0" &&
+       echo "$allowed" | grep -q "::/0"; then
+
+        echo "Dual Stack"
+
+    elif echo "$allowed" | grep -q "0.0.0.0/0"; then
+
+        echo "IPv4"
+
+    elif echo "$allowed" | grep -q "::/0"; then
+
+        echo "IPv6"
+
+    else
+
+        echo "Partial"
+
+    fi
+}
+
+########################################
 # Information
 ########################################
 
