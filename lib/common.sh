@@ -157,6 +157,29 @@ get_profile_routing() {
     fi
 }
 
+profile_has_ipv4() {
+
+    local profile="$1"
+
+    local allowed
+
+    allowed="$(get_profile_allowed_ips "$profile")"
+
+    echo "$allowed" | grep -q "0.0.0.0/0"
+}
+
+
+profile_has_ipv6() {
+
+    local profile="$1"
+
+    local allowed
+
+    allowed="$(get_profile_allowed_ips "$profile")"
+
+    echo "$allowed" | grep -q "::/0"
+}
+
 ########################################
 # Information
 ########################################

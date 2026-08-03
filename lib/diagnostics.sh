@@ -54,7 +54,7 @@ validate_private_key() {
 
     local profile="$1"
 
-    if grep -q "^PrivateKey" "$profile"; then
+    if profile_has_private_key "$profile"; then
         diag_ok "PrivateKey present"
         return 0
     fi
@@ -68,7 +68,7 @@ validate_peer_key() {
 
     local profile="$1"
 
-    if grep -q "^PublicKey" "$profile"; then
+    if profile_has_peer_key "$profile"; then
         diag_ok "Peer PublicKey present"
         return 0
     fi
@@ -84,7 +84,7 @@ validate_endpoint() {
 
     local endpoint
 
-    endpoint=$(grep "^Endpoint" "$profile" | sed 's/^Endpoint = //' || true)
+    endpoint="$(get_profile_endpoint "$profile")"
 
     if [ -n "$endpoint" ]; then
         diag_ok "Endpoint: $endpoint"
@@ -100,11 +100,7 @@ validate_ipv4_routing() {
 
     local profile="$1"
 
-    local allowed
-
-    allowed=$(grep "^AllowedIPs" "$profile" || true)
-
-    if echo "$allowed" | grep -q "0.0.0.0/0"; then
+    if profile_has_ipv4 "$profile"; then
         diag_ok "IPv4 routing enabled"
         return 0
     fi
@@ -118,11 +114,7 @@ validate_ipv6_routing() {
 
     local profile="$1"
 
-    local allowed
-
-    allowed=$(grep "^AllowedIPs" "$profile" || true)
-
-    if echo "$allowed" | grep -q "::/0"; then
+    if profile_has_ipv6 "$profile"; then
         diag_ok "IPv6 routing enabled"
         return 0
     fi
