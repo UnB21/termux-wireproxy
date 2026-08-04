@@ -16,3 +16,4 @@ state/
 *.swp
 *.bak
 README.md.backup
+dnscheck.go
