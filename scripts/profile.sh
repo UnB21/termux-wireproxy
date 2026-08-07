@@ -9,15 +9,22 @@ source "$PROJECT_DIR/lib/common.sh"
 COMMAND="${1:-}"
 
 case "$COMMAND" in
+
+    list)
+        exec "$PROJECT_DIR/scripts/profiles.sh"
+        ;;
+
     info)
         shift
         ;;
+
     validate)
-        shift
         exec "$PROJECT_DIR/scripts/doctor.sh"
         ;;
+
     *)
         echo "Usage:"
+        echo "  twp profile list"
         echo "  twp profile info <profile>"
         echo "  twp profile validate"
         exit 1
