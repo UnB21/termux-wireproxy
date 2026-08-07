@@ -6,13 +6,33 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$PROJECT_DIR/lib/common.sh"
 
-if [ "$#" -ne 2 ] || [ "$1" != "info" ]; then
+COMMAND="${1:-}"
+
+case "$COMMAND" in
+    info)
+        shift
+        ;;
+    validate)
+        shift
+        exec "$PROJECT_DIR/scripts/doctor.sh"
+        ;;
+    *)
+        echo "Usage:"
+        echo "  twp profile info <profile>"
+        echo "  twp profile validate"
+        exit 1
+        ;;
+esac
+
+# Existing "info" implementation starts here...
+
+PROFILE_NAME="${1:-}"
+
+if [ -z "$PROFILE_NAME" ]; then
     echo "Usage:"
     echo "  twp profile info <profile>"
     exit 1
 fi
-
-PROFILE_NAME="$2"
 
 if ! profile_exists "$PROVIDER" "$PROFILE_NAME"; then
     echo "ERROR: Profile not found:"
