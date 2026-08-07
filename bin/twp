@@ -37,6 +37,11 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/profiles.sh"
         ;;
 
+    profile)
+        shift
+        "$PROJECT_DIR/scripts/profile.sh" "$@"
+        ;;
+
     providers)
         "$PROJECT_DIR/scripts/providers.sh"
         ;;
@@ -54,12 +59,7 @@ case "$COMMAND" in
         ;;
 
     config)
-      exec "$PROJECT_DIR/scripts/config.sh"
-        ;;
-
-    profile)
-        shift
-        "$PROJECT_DIR/scripts/profile.sh" "$@"
+        exec "$PROJECT_DIR/scripts/config.sh"
         ;;
 
     use)
@@ -107,13 +107,15 @@ Usage:
   twp health
   twp current
   twp profiles
+  twp profile list
+  twp profile info <profile>
+  twp profile validate
   twp providers
   twp doctor
   twp ip
   twp logs
   twp logs -f
   twp config
-  twp profile info <profile>
   twp use <provider> <profile>
   twp version
   twp install
@@ -125,6 +127,8 @@ Aliases:
 Examples:
 
   twp profiles
+
+  twp profile info jcwgconfig3-US-FREE-46.conf
 
   twp use proton jcwgconfig3-US-FREE-46-ipv4test.conf
 
