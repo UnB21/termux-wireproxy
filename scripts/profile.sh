@@ -14,6 +14,95 @@ case "$COMMAND" in
         exec "$PROJECT_DIR/scripts/profiles.sh"
         ;;
 
+    compare)
+        shift
+
+        if [ "$#" -ne 2 ]; then
+            echo "Usage:"
+            echo "  twp profile compare <profile1> <profile2>"
+            exit 1
+        fi
+
+        PROFILE_A="$1"
+        PROFILE_B="$2"
+
+        if ! profile_exists "$PROVIDER" "$PROFILE_A"; then
+            echo "ERROR: Profile not found:"
+            echo "$PROJECT_DIR/providers/$PROVIDER/$PROFILE_A"
+            exit 1
+        fi
+
+        if ! profile_exists "$PROVIDER" "$PROFILE_B"; then
+            echo "ERROR: Profile not found:"
+            echo "$PROJECT_DIR/providers/$PROVIDER/$PROFILE_B"
+            exit 1
+        fi
+
+        PROFILE_A_PATH="$PROJECT_DIR/providers/$PROVIDER/$PROFILE_A"
+        PROFILE_B_PATH="$PROJECT_DIR/providers/$PROVIDER/$PROFILE_B"
+
+        echo "================================="
+        echo " WireGuard Profile Comparison"
+        echo "================================="
+        echo
+
+        echo "Provider:"
+        echo "$PROVIDER"
+        echo
+
+        echo "Profile A:"
+        echo "$PROFILE_A"
+        echo
+
+        echo "Profile B:"
+        echo "$PROFILE_B"
+        echo
+
+        echo "Endpoint:"
+        echo "A: $(get_profile_endpoint "$PROFILE_A_PATH")"
+        echo "B: $(get_profile_endpoint "$PROFILE_B_PATH")"
+        echo
+
+        echo "Routing:"
+        echo "A: $(get_profile_routing "$PROFILE_A_PATH")"
+        echo "B: $(get_profile_routing "$PROFILE_B_PATH")"
+        echo
+
+        echo "IPv4 Routing:"
+        if profile_has_ipv4 "$PROFILE_A_PATH" && profile_has_ipv4 "$PROFILE_B_PATH"; then
+            echo "MATCH"
+        else
+            echo "DIFFERENT"
+        fi
+        echo
+
+        echo "IPv6 Routing:"
+        if profile_has_ipv6 "$PROFILE_A_PATH" && profile_has_ipv6 "$PROFILE_B_PATH"; then
+            echo "MATCH"
+        else
+            echo "DIFFERENT"
+        fi
+        echo
+
+        echo "Private Keys:"
+        if profile_has_private_key "$PROFILE_A_PATH" && profile_has_private_key "$PROFILE_B_PATH"; then
+            echo "Present in both"
+        else
+            echo "Difference detected"
+        fi
+
+        echo
+
+        echo "Peer Keys:"
+        if profile_has_peer_key "$PROFILE_A_PATH" && profile_has_peer_key "$PROFILE_B_PATH"; then
+            echo "Present in both"
+        else
+            echo "Difference detected"
+        fi
+
+        exit 0
+        ;;
+
     info)
         shift
         ;;
@@ -26,6 +115,7 @@ case "$COMMAND" in
         echo "Usage:"
         echo "  twp profile list"
         echo "  twp profile info <profile>"
+        echo "  twp profile compare <profile1> <profile2>"
         echo "  twp profile validate"
         exit 1
         ;;
