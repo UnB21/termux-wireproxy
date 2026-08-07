@@ -201,6 +201,34 @@ list_profiles() {
 }
 
 ########################################
+# Runtime Helpers
+########################################
+
+get_runtime_config() {
+    printf '%s\n' "$WIREPROXY_CONFIG"
+}
+
+get_log_file() {
+    printf '%s\n' "$LOG_DIR/wireproxy.log"
+}
+
+get_pid_file() {
+    printf '%s\n' "$PID_FILE"
+}
+
+get_socks_address() {
+    printf '%s:%s\n' "$SOCKS_HOST" "$SOCKS_PORT"
+}
+
+get_project_dir() {
+    printf '%s\n' "$PROJECT_DIR"
+}
+
+get_profile_path() {
+    printf '%s\n' "$WG_CONFIG"
+}
+
+########################################
 # Information
 ########################################
 

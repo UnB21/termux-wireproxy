@@ -53,6 +53,10 @@ case "$COMMAND" in
         "$PROJECT_DIR/scripts/logs.sh" "$@"
         ;;
 
+    config)
+      exec "$PROJECT_DIR/scripts/config.sh"
+        ;;
+
     use)
         shift
 
@@ -103,6 +107,7 @@ Usage:
   twp ip
   twp logs
   twp logs -f
+  twp config
   twp use <provider> <profile>
   twp version
   twp install
