@@ -324,10 +324,6 @@ case "$COMMAND" in
         echo "$PROFILE_PATH"
         ;;
 
-    validate)
-        exec "$PROJECT_DIR/scripts/doctor.sh"
-        ;;
-
     *)
         echo "Usage:"
         echo "  twp profile list"
@@ -335,7 +331,6 @@ case "$COMMAND" in
         echo "  twp profile info <profile>"
         echo "  twp profile compare <profile1> <profile2>"
         echo "  twp profile check <profile>"
-        echo "  twp profile validate"
         exit 1
         ;;
 esac

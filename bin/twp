@@ -112,7 +112,6 @@ Usage:
   twp profile info <profile>
   twp profile compare <profile1> <profile2>
   twp profile check <profile>
-  twp profile validate
   twp providers
   twp doctor
   twp ip
