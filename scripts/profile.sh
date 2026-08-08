@@ -103,6 +103,143 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    check)
+        shift
+
+        if [ "$#" -ne 1 ]; then
+            echo "Usage:"
+            echo "  twp profile check <profile>"
+            exit 1
+        fi
+
+        PROFILE_NAME="$1"
+        PROFILE_PATH="$PROJECT_DIR/providers/$PROVIDER/$PROFILE_NAME"
+
+        if ! profile_exists "$PROVIDER" "$PROFILE_NAME"; then
+            echo "ERROR: Profile not found:"
+            echo "$PROFILE_PATH"
+            exit 1
+        fi
+
+        VALID=1
+
+        echo "================================="
+        echo " WireGuard Profile Check"
+        echo "================================="
+        echo
+
+        echo "Provider:"
+        echo "$PROVIDER"
+        echo
+
+        echo "Profile:"
+        echo "$PROFILE_NAME"
+        echo
+
+        echo "Path:"
+        echo "$PROFILE_PATH"
+        echo
+
+        echo "=== File Check ==="
+
+        if [ -r "$PROFILE_PATH" ]; then
+            echo "[✓] Profile is readable"
+        else
+            echo "[✗] Profile is not readable"
+            VALID=0
+        fi
+
+        echo
+
+        echo "=== Section Check ==="
+
+        if grep -q '^[[:space:]]*\[Interface\][[:space:]]*$' "$PROFILE_PATH"; then
+            echo "[✓] [Interface] section found"
+        else
+            echo "[✗] [Interface] section missing"
+            VALID=0
+        fi
+
+        if grep -q '^[[:space:]]*\[Peer\][[:space:]]*$' "$PROFILE_PATH"; then
+            echo "[✓] [Peer] section found"
+        else
+            echo "[✗] [Peer] section missing"
+            VALID=0
+        fi
+
+        echo
+
+        echo "=== Key Check ==="
+
+        if profile_has_private_key "$PROFILE_PATH"; then
+            echo "[✓] PrivateKey present"
+        else
+            echo "[✗] PrivateKey missing"
+            VALID=0
+        fi
+
+        if profile_has_peer_key "$PROFILE_PATH"; then
+            echo "[✓] Peer PublicKey present"
+        else
+            echo "[✗] Peer PublicKey missing"
+            VALID=0
+        fi
+
+        echo
+
+        echo "=== Endpoint Check ==="
+
+        ENDPOINT="$(get_profile_endpoint "$PROFILE_PATH")"
+
+        if [ -n "$ENDPOINT" ]; then
+            echo "[✓] Endpoint present"
+            echo "    $ENDPOINT"
+
+            if printf '%s\n' "$ENDPOINT" | grep -Eq '^[^:[:space:]]+:[0-9]+$'; then
+                echo "[✓] Endpoint format valid"
+            else
+                echo "[✗] Endpoint format invalid"
+                VALID=0
+            fi
+        else
+            echo "[✗] Endpoint missing"
+            VALID=0
+        fi
+
+        echo
+
+        echo "=== Routing Check ==="
+
+        if profile_has_ipv4 "$PROFILE_PATH"; then
+            echo "[✓] IPv4 routing enabled"
+        else
+            echo "[ ] IPv4 routing disabled"
+        fi
+
+        if profile_has_ipv6 "$PROFILE_PATH"; then
+            echo "[✓] IPv6 routing enabled"
+        else
+            echo "[ ] IPv6 routing disabled"
+        fi
+
+        if ! profile_has_ipv4 "$PROFILE_PATH" && ! profile_has_ipv6 "$PROFILE_PATH"; then
+            echo "[✗] No IP routing configured"
+            VALID=0
+        fi
+
+        echo
+
+        echo "================================="
+
+        if [ "$VALID" -eq 1 ]; then
+            echo "STATUS: VALID"
+            exit 0
+        else
+            echo "STATUS: INVALID"
+            exit 1
+        fi
+        ;;
+
     info)
         shift
         ;;
@@ -116,6 +253,7 @@ case "$COMMAND" in
         echo "  twp profile list"
         echo "  twp profile info <profile>"
         echo "  twp profile compare <profile1> <profile2>"
+        echo "  twp profile check <profile>"
         echo "  twp profile validate"
         exit 1
         ;;
@@ -136,7 +274,6 @@ if ! profile_exists "$PROVIDER" "$PROFILE_NAME"; then
     echo "$PROJECT_DIR/providers/$PROVIDER/$PROFILE_NAME"
     exit 1
 fi
-
 
 PROFILE_PATH="$PROJECT_DIR/providers/$PROVIDER/$PROFILE_NAME"
 

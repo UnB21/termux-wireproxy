@@ -110,6 +110,7 @@ Usage:
   twp profile list
   twp profile info <profile>
   twp profile compare <profile1> <profile2>
+  twp profile check <profile>
   twp profile validate
   twp providers
   twp doctor
@@ -132,6 +133,8 @@ Examples:
   twp profile info jcwgconfig3-US-FREE-46.conf
 
   twp profile compare jcwgconfig2-NL-FREE-102.conf jcwgconfig3-US-FREE-46.conf
+
+  twp profile check jcwgconfig3-US-FREE-46.conf
 
   twp use proton jcwgconfig3-US-FREE-46-ipv4test.conf
 
