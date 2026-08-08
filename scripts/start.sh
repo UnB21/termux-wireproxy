@@ -25,6 +25,21 @@ WGConfig = $WG_CONFIG
 BindAddress = $SOCKS_HOST:$SOCKS_PORT
 EOF
 
+echo "Validating WireProxy configuration..."
+
+if ! "$WIREPROXY_BIN" --configtest -c "$WIREPROXY_CONFIG"; then
+    echo
+    echo "ERROR: WireProxy configuration validation failed."
+    echo "Configuration:"
+    echo "$WIREPROXY_CONFIG"
+    echo
+    echo "WireProxy was not started."
+    exit 1
+fi
+
+echo "WireProxy configuration is valid."
+echo
+
 echo "Starting wireproxy..."
 
 "$WIREPROXY_BIN" -s -c "$WIREPROXY_CONFIG" \
