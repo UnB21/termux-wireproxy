@@ -14,6 +14,20 @@ case "$COMMAND" in
         exec "$PROJECT_DIR/scripts/profiles.sh"
         ;;
 
+    use)
+        shift
+
+        if [ "$#" -ne 1 ]; then
+            echo "Usage:"
+            echo "  twp profile use <profile>"
+            exit 1
+        fi
+
+        PROFILE_NAME="$1"
+
+        exec "$PROJECT_DIR/scripts/use.sh" "$PROVIDER" "$PROFILE_NAME"
+        ;;
+
     compare)
         shift
 
@@ -251,6 +265,7 @@ case "$COMMAND" in
     *)
         echo "Usage:"
         echo "  twp profile list"
+        echo "  twp profile use <profile>"
         echo "  twp profile info <profile>"
         echo "  twp profile compare <profile1> <profile2>"
         echo "  twp profile check <profile>"

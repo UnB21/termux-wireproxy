@@ -108,6 +108,7 @@ Usage:
   twp current
   twp profiles
   twp profile list
+  twp profile use <profile>
   twp profile info <profile>
   twp profile compare <profile1> <profile2>
   twp profile check <profile>
@@ -129,6 +130,8 @@ Aliases:
 Examples:
 
   twp profiles
+
+  twp profile use jcwgconfig3-US-FREE-46.conf
 
   twp profile info jcwgconfig3-US-FREE-46.conf
 
