@@ -5,6 +5,7 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$PROJECT_DIR/lib/common.sh"
+source "$PROJECT_DIR/lib/diagnostics.sh"
 
 if [ $# -ne 2 ]; then
     echo "Usage:"
@@ -31,6 +32,22 @@ if [ ! -f "$PROFILE_PATH" ]; then
     echo "$PROFILE_PATH"
     exit 1
 fi
+
+echo
+echo "Validating WireGuard profile..."
+
+if ! validate_wireguard_profile "$PROFILE_PATH"; then
+    echo
+    echo "ERROR: WireGuard profile validation failed."
+    echo "Profile:"
+    echo "$PROFILE_PATH"
+    echo
+    echo "Active configuration was not changed."
+    exit 1
+fi
+
+echo
+echo "WireGuard profile is valid."
 
 LOCAL_CONFIG="$PROJECT_DIR/configs/project.local.conf"
 
