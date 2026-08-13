@@ -6,7 +6,7 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$PROJECT_DIR/lib/common.sh"
 source "$PROJECT_DIR/lib/diagnostics.sh"
-
+source "$PROJECT_DIR/lib/security.sh"
 FAILURES=0
 
 echo "================================="
@@ -75,6 +75,12 @@ if command -v curl >/dev/null 2>&1 &&
 
 else
     diag_fail "SOCKS5 proxy unavailable"
+    FAILURES=$((FAILURES + 1))
+fi
+
+diag_section "Security Check"
+
+if ! security_check_all; then
     FAILURES=$((FAILURES + 1))
 fi
 
