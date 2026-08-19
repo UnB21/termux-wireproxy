@@ -177,6 +177,7 @@ if "$PROJECT_DIR/scripts/restart.sh"; then
     cleanup_backup
 
     # Reload the restored configuration for accurate reporting.
+    # shellcheck source=../configs/project.local.conf
     source "$LOCAL_CONFIG"
 
     echo
